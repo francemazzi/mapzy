@@ -14,8 +14,6 @@ const inputElevation = document.querySelector('.form__input--elevation');
 if (navigator.geolocation) {
   navigator.geolocation.getCurrentPosition(
     function (position) {
-      console.log(position);
-
       //Destruttiriamo la latitudine e creiamo una variabile basata sulla proprietà di questo oggetto
       const { latitude } = position.coords.latitude;
     },
