@@ -18,20 +18,17 @@ if (navigator.geolocation) {
     const longitudine = posizione.coords.longitude;
     console.log(`https://www.google.it/maps/@${latitudine}.${longitudine},14z`);
 
-    //leaflet
-    //Adattiamo il codice -> ogni stirng che passa dentro map() deve essere l'elemento che viene visto nella mappa
-    //Lo troviamo nel codice HTML --> lo troviamo indo e l'id del div è map
-    //L è il nome del API usato da leaflet -> quest L ha metodi che utilizziamo
-    var map = L.map('map').setView([51.505, -0.09], 13);
+    const coords = [latitudine, longitudine];
+    var map = L.map('map').setView(coords, 13);
 
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution:
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(map);
 
-    L.marker([51.5, -0.09])
+    L.marker(coords)
       .addTo(map)
-      .bindPopup('A pretty CSS3 popup.<br> Easily customizable.')
+      .bindPopup('Ciao! 👋🏻<br> Ti trovi qui!')
       .openPopup();
   }
   function gestisciErrore(error) {
@@ -51,4 +48,3 @@ if (navigator.geolocation) {
     }
   }
 }
-console.log(firstName);
