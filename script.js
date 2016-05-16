@@ -17,19 +17,33 @@ if (navigator.geolocation) {
     const latitudine = posizione.coords.latitude;
     const longitudine = posizione.coords.longitude;
     console.log(`https://www.google.it/maps/@${latitudine}.${longitudine},14z`);
-
     const coords = [latitudine, longitudine];
-    var map = L.map('map').setView(coords, 13);
+
+    const map = L.map('map').setView(coords, 13);
 
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution:
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(map);
 
-    L.marker(coords)
-      .addTo(map)
-      .bindPopup('Ciao! 👋🏻<br> Ti trovi qui!')
-      .openPopup();
+    map.on('click', function (mapEvent) {
+      console.log(mapEvent);
+      //destrurriamo l'oggetto dell'evento per ottenere coordinate
+      const { lat, lng } = mapEvent.latlng;
+      L.marker([lat, lng])
+        .addTo(map)
+        .bindPopup(
+          L.popup({
+            maxWidth: 250,
+            minWidth: 100,
+            autoClose: false,
+            closeOnClick: false,
+            className: 'running-popup',
+          })
+        )
+        .setPopupContent('Punto<br>del circuito 🐎!')
+        .openPopup();
+    });
   }
   function gestisciErrore(error) {
     switch (error.code) {
