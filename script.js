@@ -31,27 +31,24 @@ class App {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         this._loadMap.bind(this),
-        function () {
-          alert('Errore connessione del GPS');
+        function gestisciErrore(error) {
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              console.log("Permesso negato dall'utente");
+              break;
+            case error.POSITION_UNAVAILABLE:
+              console.log('Impossibile determinare la posizione corrente');
+              break;
+            case error.TIMEOUT:
+              console.log(
+                'Il rilevamento della posizione impiega troppo tempo'
+              );
+              break;
+            case error.UNKNOWN_ERROR:
+              console.log('Si è verificato un errore sconosciuto');
+              break;
+          }
         }
-        // function gestisciErrore(error) {
-        //   switch (error.code) {
-        //     case error.PERMISSION_DENIED:
-        //       console.log("Permesso negato dall'utente");
-        //       break;
-        //     case error.POSITION_UNAVAILABLE:
-        //       console.log('Impossibile determinare la posizione corrente');
-        //       break;
-        //     case error.TIMEOUT:
-        //       console.log(
-        //         'Il rilevamento della posizione impiega troppo tempo'
-        //       );
-        //       break;
-        //     case error.UNKNOWN_ERROR:
-        //       console.log('Si è verificato un errore sconosciuto');
-        //       break;
-        //   }
-        // }
       );
     }
   }
