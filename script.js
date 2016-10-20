@@ -174,13 +174,19 @@ class App {
     if (type === 'cycling') {
       const elevation = +inputElevation.value;
 
-      //Controllo if se dati sono validi -> se distanza, durata e cadenza non sono numero
-      if (
-        !validInput(distance, duration, elevation) ||
-        !allPositive(distance, duration, elevation)
-      ) {
-        return alert('Deve inserire un valore positivo! 🚴🏻');
-      }
+      /////////////////////////
+      //NON FUNZIONA DA CORREGGERE
+      // if (
+      //   !validInputs(distance, duration, elevation) ||
+      //   !allPositive(distance, duration)
+      // ) {
+      //   return alert('Deve inserire un valore positivo! 🚴🏻');
+      // }
+      /////////////////////////
+      // script.js:177 Uncaught ReferenceError: validInputs is not defined
+
+      /////////////////////////
+
       workout = new Cycling([lat, lng], distance, duration, elevation);
     }
     //Aggiungere nuovo oggetto al workout array
