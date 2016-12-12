@@ -91,15 +91,16 @@ class App {
   #map;
   #mapEvent;
   #workouts = [];
+  #mapZoomLevel = 13;
 
   constructor() {
     this._getPosition();
-    //
     form.addEventListener('submit', this._newWorkout.bind(this));
-
     //Inseriamo la selezione running|cycling -> inpuType
     //Andiamo a vedere come sono nascosti i form
-    inputType.addEventListener('change', this._toggleElevationField);
+    inputType.addEventListener('change', this._toogleElevationField);
+    //il this dentro a _moveToPopup(this) è associato per renderla corretta
+    containerWorkouts.addEventListener('click', this._moveToPopup.bind(this));
   }
   _getPosition() {
     if (navigator.geolocation) {
@@ -132,7 +133,7 @@ class App {
     console.log(`https://www.google.it/maps/@${latitudine}.${longitudine},14z`);
     const coords = [latitudine, longitudine];
 
-    this.#map = L.map('map').setView(coords, 13);
+    this.#map = L.map('map').setView(coords, this.#mapZoomLevel);
 
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution:
@@ -204,20 +205,16 @@ class App {
     }
 
     //Se l'attività è la bicicletta creare oggetto cycling
-    if (type === 'Cycling') {
+    if (type === 'cycling') {
       const elevation = +inputElevation.value;
 
-      /////////////////////////
-      //NON FUNZIONA DA CORREGGERE
-      if (
-        !validInputs(distance, duration, elevation) ||
-        !allPositive(distance, duration)
-      ) {
-        return alert('Deve inserire un valore positivo! 🚴🏻');
-      }
-      /////////////////////////
-      //errore stampato --> script.js:177 Uncaught ReferenceError: validInputs is not defined
-      /////////////////////////
+      // if (
+      //   !validInputs(distance, duration, elevation) ||
+      //   !allPositive(distance, duration)
+      // ) {
+      //   return alert('Deve inserire un valore positivo! 🚴🏻');
+      // }
+
       workout = new Cycling([lat, lng], distance, duration, elevation);
     }
     //Aggiungere nuovo oggetto al workout array
@@ -294,6 +291,23 @@ class App {
           </div>
             `;
     form.insertAdjacentHTML('afterend', html);
+  }
+  _moveToPopup(e) {
+    const workoutEl = e.target.closest('.workout');
+    console.log(workoutEl);
+    //Se non c'è un elemento del workout effettua il return
+    if (!workoutEl) return;
+    const workout = this.#workouts.find(
+      work => work.id === workoutEl.dataset.id
+    );
+    //metodo per ottimizzare la vista e con libreria leaflet andiamo a migliorare animazione
+    //permette di fare muovere dove abbiamo posizionato il marker cliccando su menu esercizi
+    this.#map.setView(workout.coords, this.#mapZoomLevel, {
+      animate: true,
+      pan: {
+        duration: 1,
+      },
+    });
   }
 }
 
