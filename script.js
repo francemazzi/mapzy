@@ -24,6 +24,7 @@ class Workout {
     this.coords = coords; //[lat, lng]
     this.distance = distance; //in km
     this.duration = duration; // in minuti
+    this.clicks = 0;
   }
   _setDescription() {
     const months = [
@@ -43,6 +44,9 @@ class Workout {
     this.description = `${this.type[0].toUpperCase()}${this.type.slice(1)} il ${
       months[this.date.getMonth()]
     } ${this.date.getDate()}`;
+  }
+  click() {
+    this.clicks++;
   }
 }
 
@@ -79,9 +83,9 @@ class Cycling extends Workout {
 }
 
 //creazione nuova allenamento
-const run1 = new Running([39, -12], 5.2, 24, 178);
-const cycling1 = new Cycling([39, -12], 27, 95, 523);
-console.log(run1, cycling1);
+// const run1 = new Running([39, -12], 5.2, 24, 178);
+// const cycling1 = new Cycling([39, -12], 27, 95, 523);
+// console.log(run1, cycling1);
 
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
@@ -294,7 +298,6 @@ class App {
   }
   _moveToPopup(e) {
     const workoutEl = e.target.closest('.workout');
-    console.log(workoutEl);
     //Se non c'è un elemento del workout effettua il return
     if (!workoutEl) return;
     const workout = this.#workouts.find(
@@ -308,7 +311,10 @@ class App {
         duration: 1,
       },
     });
+    //Utilizzare interfaccia pubblica
+    workout.click();
   }
 }
 
 const app = new App();
+console.log(workout);
