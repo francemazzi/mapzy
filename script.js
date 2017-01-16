@@ -98,7 +98,13 @@ class App {
   #mapZoomLevel = 13;
 
   constructor() {
+    //Ottieni la Posizione
     this._getPosition();
+
+    //Ottieni informazioni dal local storage
+    this._getLocalStorage();
+
+    //Attach event handlers
     form.addEventListener('submit', this._newWorkout.bind(this));
     //Inseriamo la selezione running|cycling -> inpuType
     //Andiamo a vedere come sono nascosti i form
@@ -146,6 +152,11 @@ class App {
 
     //Hanfling clicks on map --> abbiamo la possobiilità di accedere all'evneto map
     this.#map.on('click', this._showForm.bind(this));
+    //caricamento dei marker della mappa in _loadMap -> perchè la mappa carica dopo rispetto a _getLocalStorage
+    //_getLocalStorage carica subito la side bar mentre _renderWorkoutMarker engono caricati dopo
+    this.#workouts.forEach(work => {
+      this._renderWorkoutMarker(work);
+    });
   }
   _showForm(mapE) {
     this.#mapEvent = mapE;
@@ -232,6 +243,9 @@ class App {
     //Nascondi mappa
     this._hideForm();
     // il primo problema è che dobbiamo utilizzare due variabili che non esistono in questo scope
+
+    //Creazione memorizzazione locale dati
+    this._setLocalStorage();
   }
   _renderWorkoutMarker(workout) {
     L.marker(workout.coords)
@@ -314,7 +328,24 @@ class App {
     //Utilizzare interfaccia pubblica
     workout.click();
   }
+  _setLocalStorage() {
+    //storage fatto da API JSON, per settare ->  string associata (chiave) 3 valore da memorizzare
+    //Utilizziamo stringify che converte valori istringhe
+    localStorage.setItem('workout', JSON.stringify(this.#workouts));
+  }
+  _getLocalStorage() {
+    const data = JSON.parse(localStorage.getItem('workout'));
+    console.log(data);
+    //Se non ci sono dati ritorna
+    if (!data) return;
+    //Altrimenti ripristina la nostra matrice di workout:
+    this.#workouts = data;
+    //questi data li inseriamo in liste
+    //dato che non vogliamo creare nessun array usiamo forEach
+    this.#workouts.forEach(work => {
+      this._renderWorkout(work);
+    });
+  }
 }
 
 const app = new App();
-console.log(workout);
