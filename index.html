@@ -4,12 +4,45 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mapzy</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.1/dist/leaflet.css" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css"
+    />
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
+    <aside class="sidebar">
+      <h1>Mapzy</h1>
+      <form class="form hidden">
+        <label>
+          Tipo
+          <select class="input-type">
+            <option value="running">Corsa</option>
+            <option value="cycling">Bicicletta</option>
+          </select>
+        </label>
+        <label>
+          Distanza
+          <input class="input-distance" placeholder="km" />
+        </label>
+        <label>
+          Durata
+          <input class="input-duration" placeholder="min" />
+        </label>
+        <label class="row-cadence">
+          Ritmo
+          <input class="input-cadence" placeholder="passi/min" />
+        </label>
+        <label class="row-elevation hidden">
+          Dislivello
+          <input class="input-elevation" placeholder="metri" />
+        </label>
+        <button type="submit">OK</button>
+      </form>
+      <ul class="workouts"></ul>
+    </aside>
     <div id="map-canvas" class="map-canvas"></div>
-    <script src="https://unpkg.com/leaflet@1.0.1/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
     <script src="script.js"></script>
   </body>
 </html>
