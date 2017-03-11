@@ -71,7 +71,6 @@ class Cycling extends Workout {
   constructor(coords, distance, duration, elevationGain) {
     super(coords, distance, duration);
     this.elevationGain = elevationGain;
-    // this.type = 'cycling'
     this.calcSpeed();
     this._setDescription();
   }
@@ -82,7 +81,7 @@ class Cycling extends Workout {
   }
 }
 
-//creazione nuova allenamento
+//creazione nuova allenamento fittizio per test
 // const run1 = new Running([39, -12], 5.2, 24, 178);
 // const cycling1 = new Cycling([39, -12], 27, 95, 523);
 // console.log(run1, cycling1);
@@ -91,7 +90,7 @@ class Cycling extends Workout {
 //////////////////////////////////////////////////////////////////////////
 //Architettura applicazione
 class App {
-  //private
+  //variabili private
   #map;
   #mapEvent;
   #workouts = [];
@@ -223,13 +222,14 @@ class App {
     if (type === 'cycling') {
       const elevation = +inputElevation.value;
 
+      //Da correggere/////////////////BUGGA  quando si può correggere meglio! ///////////////////////////////////
       // if (
       //   !validInputs(distance, duration, elevation) ||
       //   !allPositive(distance, duration)
       // ) {
       //   return alert('Deve inserire un valore positivo! 🚴🏻');
       // }
-
+      /////////////////////////////////////////////////////////////////////////////////////////////////////////
       workout = new Cycling([lat, lng], distance, duration, elevation);
     }
     //Aggiungere nuovo oggetto al workout array
@@ -308,6 +308,7 @@ class App {
             <span class="workout__unit">m</span>
           </div>
             `;
+    //Inseriscee codice HTML sotto al genitore
     form.insertAdjacentHTML('afterend', html);
   }
   _moveToPopup(e) {
