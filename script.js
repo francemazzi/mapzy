@@ -7,6 +7,7 @@ const inputDistance = document.querySelector('.form__input--distance');
 const inputDuration = document.querySelector('.form__input--duration');
 const inputCadence = document.querySelector('.form__input--cadence');
 const inputElevation = document.querySelector('.form__input--elevation');
+const inputDelete = document.querySelector('.workout__delete');
 
 //Variabili reste private
 // let map, mapEvent;
@@ -110,6 +111,9 @@ class App {
     inputType.addEventListener('change', this._toogleElevationField);
     //il this dentro a _moveToPopup(this) è associato per renderla corretta
     containerWorkouts.addEventListener('click', this._moveToPopup.bind(this));
+
+    //ELIMINARE FORM -> INCOMPIUTO
+    // inputDelete.addEventListener('click', this._deleteForm.bind(this));
   }
   _getPosition() {
     if (navigator.geolocation) {
@@ -191,7 +195,6 @@ class App {
     const { lat, lng } = this.#mapEvent.latlng;
     let workout;
     //Vedere se dati sono valii
-
     //Se l'attività è la corsa creare oggetto running
     if (type === 'running') {
       //controllo input valido -> funzione che legge se input è finito o meno
@@ -293,6 +296,7 @@ class App {
       <span class="workout__icon">🦶🏼</span>
       <span class="workout__value">${workout.cadence}</span>
       <span class="workout__unit">spm</span>
+      <span class="workout__delete">❌</span>
     </div>
     </li> `;
     if (workout.type === 'cycling')
@@ -306,6 +310,7 @@ class App {
             <span class="workout__icon">⛰</span>
             <span class="workout__value">${workout.elevationGain}</span>
             <span class="workout__unit">m</span>
+            <span class="workout__delete">❌</span>
           </div>
             `;
     //Inseriscee codice HTML sotto al genitore
@@ -329,6 +334,14 @@ class App {
     //Utilizzare interfaccia pubblica
     // workout.click();
   }
+
+  //ELIMINARE FORM -> INCOMPIUTO
+  // _deleteForm(e) {
+  //   const toDelete = e.target.closest('.workout__details');
+  //   toDelete.parentNode.removeChild(toDelete);
+  //   console.log('delete' + e);
+  // }
+
   _setLocalStorage() {
     //storage fatto da API JSON, per settare ->  string associata (chiave) 3 valore da memorizzare
     //Utilizziamo stringify che converte valori istringhe
@@ -347,6 +360,7 @@ class App {
       this._renderWorkout(work);
     });
   }
+
   reset() {
     //Per inizializzare il local storage basta rimuovere la parola chiave impostata in precendenza 'workout'
     localStorage.removeItem('workout');
