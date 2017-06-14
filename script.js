@@ -124,6 +124,8 @@ function showMap(coords) {
       '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
   }).addTo(map);
 
+  load();
+
   map.on('click', function (event) {
     clickCoords = [event.latlng.lat, event.latlng.lng];
     form.classList.remove('hidden');
@@ -157,6 +159,7 @@ form.addEventListener('submit', function (event) {
 
   workouts.push(workout);
   addMarker(workout);
+  save();
   markers[workout.id].openPopup();
   renderList();
   form.reset();
@@ -193,4 +196,62 @@ if (navigator.geolocation) {
   );
 } else {
   showMap(ROME);
+}
+
+function toRecord(workout) {
+  return {
+    id: workout.id,
+    date: workout.date.toISOString(),
+    coords: workout.coords,
+    distance: workout.distance,
+    duration: workout.duration,
+    type: workout.type,
+    cadence: workout.cadence,
+    elevation: workout.elevation,
+    pace: workout.pace,
+    speed: workout.speed,
+  };
+}
+
+function fromRecord(data) {
+  var workout =
+    data.type === 'running'
+      ? new Running(data.coords, data.distance, data.duration, data.cadence)
+      : new Cycling(data.coords, data.distance, data.duration, data.elevation);
+  workout.id = data.id;
+  workout.date = new Date(data.date);
+  if (typeof data.pace === 'number') workout.pace = data.pace;
+  if (typeof data.speed === 'number') workout.speed = data.speed;
+  return workout;
+}
+
+function save() {
+  var records = workouts.map(function (workout) {
+    return toRecord(workout);
+  });
+  try {
+    localStorage.setItem('mapzy', JSON.stringify(records));
+  } catch (err) {}
+}
+
+function load() {
+  var raw;
+  try {
+    raw = localStorage.getItem('mapzy');
+  } catch (err) {
+    return;
+  }
+  if (!raw) return;
+  var records;
+  try {
+    records = JSON.parse(raw);
+  } catch (err) {
+    return;
+  }
+  records.forEach(function (data) {
+    var workout = fromRecord(data);
+    workouts.push(workout);
+    addMarker(workout);
+  });
+  renderList();
 }
