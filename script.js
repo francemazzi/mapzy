@@ -107,6 +107,11 @@ function renderList() {
     meta.textContent = details(workout);
     item.appendChild(title);
     item.appendChild(meta);
+    var button = document.createElement('button');
+    button.type = 'button';
+    button.setAttribute('data-delete', workout.id);
+    button.textContent = 'cancella';
+    item.appendChild(button);
     list.appendChild(item);
   });
 }
@@ -172,6 +177,10 @@ form.addEventListener('submit', function (event) {
 list.addEventListener('click', function (event) {
   var node = event.target;
   while (node && node !== list) {
+    if (node.getAttribute && node.getAttribute('data-delete')) {
+      removeWorkout(node.getAttribute('data-delete'));
+      return;
+    }
     if (node.getAttribute && node.getAttribute('data-id')) {
       var id = node.getAttribute('data-id');
       var found = null;
@@ -253,5 +262,17 @@ function load() {
     workouts.push(workout);
     addMarker(workout);
   });
+  renderList();
+}
+
+function removeWorkout(id) {
+  if (markers[id]) {
+    map.removeLayer(markers[id]);
+    delete markers[id];
+  }
+  workouts = workouts.filter(function (workout) {
+    return workout.id !== id;
+  });
+  save();
   renderList();
 }
