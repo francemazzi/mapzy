@@ -9,6 +9,10 @@ const inputCadence = document.querySelector('.form__input--cadence');
 const inputElevation = document.querySelector('.form__input--elevation');
 const inputDelete = document.querySelector('.workout__delete');
 
+//Posizione di default (Roma) usata quando la geolocalizzazione
+//non è disponibile o viene negata: così la mappa si carica comunque
+const DEFAULT_COORDS = [41.9028, 12.4964];
+
 //Variabili reste private
 // let map, mapEvent;
 class Workout {
@@ -115,29 +119,36 @@ class App {
     // inputDelete.addEventListener('click', this._deleteForm.bind(this));
   }
   _getPosition() {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        this._loadMap.bind(this),
-        function gestisciErrore(error) {
-          switch (error.code) {
-            case error.PERMISSION_DENIED:
-              console.log("Permesso negato dall'utente");
-              break;
-            case error.POSITION_UNAVAILABLE:
-              console.log('Impossibile determinare la posizione corrente');
-              break;
-            case error.TIMEOUT:
-              console.log(
-                'Il rilevamento della posizione impiega troppo tempo'
-              );
-              break;
-            case error.UNKNOWN_ERROR:
-              console.log('Si è verificato un errore sconosciuto');
-              break;
-          }
+    //Se il browser non supporta la geolocalizzazione carichiamo
+    //comunque la mappa sulla posizione di default
+    if (!navigator.geolocation) return this._loadMapDefault();
+
+    navigator.geolocation.getCurrentPosition(
+      this._loadMap.bind(this),
+      error => {
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            console.warn("Permesso negato dall'utente");
+            break;
+          case error.POSITION_UNAVAILABLE:
+            console.warn('Impossibile determinare la posizione corrente');
+            break;
+          case error.TIMEOUT:
+            console.warn('Il rilevamento della posizione impiega troppo tempo');
+            break;
+          default:
+            console.warn('Si è verificato un errore sconosciuto');
         }
-      );
-    }
+        //In ogni caso d'errore mostriamo la mappa: così l'utente può
+        //sempre cliccare e aggiungere un allenamento (fix del bug noto)
+        this._loadMapDefault();
+      }
+    );
+  }
+  _loadMapDefault() {
+    this._loadMap({
+      coords: { latitude: DEFAULT_COORDS[0], longitude: DEFAULT_COORDS[1] },
+    });
   }
   _loadMap(posizione) {
     const latitudine = posizione.coords.latitude;
