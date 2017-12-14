@@ -99,6 +99,8 @@ class App {
   #mapEvent;
   #workouts = [];
   #mapZoomLevel = 13;
+  //Marker Leaflet indicizzati per id del workout, per poterli rimuovere
+  #markers = {};
 
   constructor() {
     //Ottieni la Posizione
@@ -204,30 +206,25 @@ class App {
     const duration = +inputDuration.value;
     const { lat, lng } = this.#mapEvent.latlng;
     let workout;
-    //Vedere se dati sono valii
+
+    //Helper di validazione condivisi tra running e cycling:
+    //tutti gli input devono essere numeri finiti...
+    const validInput = (...inputs) => inputs.every(inp => Number.isFinite(inp));
+    //...e i valori indicati devono essere positivi
+    const allPositive = (...inputs) => inputs.every(inp => inp > 0);
+
     //Se l'attività è la corsa creare oggetto running
     if (type === 'running') {
-      //controllo input valido -> funzione che legge se input è finito o meno
-      const validInput = (...inputs) =>
-        inputs.every(inp => Number.isFinite(inp));
-      const allPositive = (...inputs) => inputs.every(inp => inp > 0);
-
       const cadence = +inputCadence.value;
 
-      //Controllo if se dati sono validi 
+      //Controllo if se dati sono validi
       if (
-        // !Number.isFinite(distance) ||
-        // !Number.isFinite(duration) ||
-        // !Number.isFinite(cadence)
-
-        //more simple
         !validInput(distance, duration, cadence) ||
         !allPositive(distance, duration, cadence)
       ) {
         return alert('Deve inserire un valore positivo!');
       }
 
-      //primo esempio di allenamento
       workout = new Running([lat, lng], distance, duration, cadence);
     }
 
@@ -235,14 +232,15 @@ class App {
     if (type === 'cycling') {
       const elevation = +inputElevation.value;
 
-      //Da correggere/////////////////BUGGA  quando si può correggere meglio! ///////////////////////////////////
-      // if (
-      //   !validInputs(distance, duration, elevation) ||
-      //   !allPositive(distance, duration)
-      // ) {
-      //   return alert('Deve inserire un valore positivo! 🚴🏻');
-      // }
-      /////////////////////////////////////////////////////////////////////////////////////////////////////////
+      //L'elevazione può essere negativa (discesa), quindi va solo
+      //controllato che sia un numero; distanza e durata positive
+      if (
+        !validInput(distance, duration, elevation) ||
+        !allPositive(distance, duration)
+      ) {
+        return alert('Deve inserire un valore positivo! 🚴🏻');
+      }
+
       workout = new Cycling([lat, lng], distance, duration, elevation);
     }
     //Aggiungere nuovo oggetto al workout array
@@ -260,7 +258,7 @@ class App {
     this._setLocalStorage();
   }
   _renderWorkoutMarker(workout) {
-    L.marker(workout.coords)
+    const marker = L.marker(workout.coords)
       .addTo(this.#map)
       .bindPopup(
         L.popup({
@@ -275,6 +273,8 @@ class App {
         `${workout.type === 'running' ? ' 🏃‍♂️ ' : ' 🚴🏻 '} ${workout.description}`
       )
       .openPopup();
+    //Memorizziamo il marker per poterlo rimuovere all'eliminazione
+    this.#markers[workout.id] = marker;
   }
   _renderWorkout(workout) {
     let html = `
@@ -329,27 +329,37 @@ class App {
     const workoutEl = e.target.closest('.workout');
     //Se non c'è un elemento del workout effettua il return
     if (!workoutEl) return;
+
+    //Se è stato cliccato il pulsante ❌ eliminiamo l'allenamento
+    if (e.target.classList.contains('workout__delete'))
+      return this._deleteWorkout(workoutEl);
+
     const workout = this.#workouts.find(
       work => work.id === workoutEl.dataset.id
     );
-    //metodo per ottimizzare la vista e con libreria leaflet andiamo a migliorare animazione
-    //permette di fare muovere dove abbiamo posizionato il marker cliccando su menu esercizi
+    //Sposta la vista sul marker dell'allenamento cliccato
     this.#map.setView(workout.coords, this.#mapZoomLevel, {
       animate: true,
       pan: {
         duration: 1,
       },
     });
-    //Utilizzare interfaccia pubblica
-    // workout.click();
   }
 
-  //ELIMINARE FORM -> INCOMPIUTO
-  // _deleteForm(e) {
-  //   const toDelete = e.target.closest('.workout__details');
-  //   toDelete.parentNode.removeChild(toDelete);
-  //   console.log('delete' + e);
-  // }
+  _deleteWorkout(workoutEl) {
+    const id = workoutEl.dataset.id;
+    //Rimuovi il marker dalla mappa
+    const marker = this.#markers[id];
+    if (marker) {
+      this.#map.removeLayer(marker);
+      delete this.#markers[id];
+    }
+    //Rimuovi il workout dall'array e l'elemento dalla lista
+    this.#workouts = this.#workouts.filter(work => work.id !== id);
+    workoutEl.remove();
+    //Aggiorna la persistenza
+    this._setLocalStorage();
+  }
 
   _setLocalStorage() {
     //storage fatto da API JSON, per settare ->  string associata (chiave) 3 valore da memorizzare
