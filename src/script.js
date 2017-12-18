@@ -7,14 +7,11 @@ const inputDistance = document.querySelector('.form__input--distance');
 const inputDuration = document.querySelector('.form__input--duration');
 const inputCadence = document.querySelector('.form__input--cadence');
 const inputElevation = document.querySelector('.form__input--elevation');
-const inputDelete = document.querySelector('.workout__delete');
 
 //Posizione di default (Roma) usata quando la geolocalizzazione
 //non è disponibile o viene negata: così la mappa si carica comunque
 const DEFAULT_COORDS = [41.9028, 12.4964];
 
-//Variabili reste private
-// let map, mapEvent;
 class Workout {
   //Data di creazione del workout
   date = new Date();
@@ -85,13 +82,6 @@ class Cycling extends Workout {
   }
 }
 
-//creazione nuova allenamento fittizio per test
-// const run1 = new Running([39, -12], 5.2, 24, 178);
-// const cycling1 = new Cycling([39, -12], 27, 95, 523);
-// console.log(run1, cycling1);
-
-//////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////
 //Architettura applicazione
 class App {
   //variabili private
@@ -111,14 +101,10 @@ class App {
 
     //Attach event handlers
     form.addEventListener('submit', this._newWorkout.bind(this));
-    //Inseriamo la selezione running|cycling -> inpuType
-    //Andiamo a vedere come sono nascosti i form
+    //Cambio tipo running|cycling -> mostra il campo corretto
     inputType.addEventListener('change', this._toogleElevationField);
-    //il this dentro a _moveToPopup(this) è associato per renderla corretta
+    //Click sulla lista: pan al marker oppure eliminazione (delega eventi)
     containerWorkouts.addEventListener('click', this._moveToPopup.bind(this));
-
-    //ELIMINARE FORM -> INCOMPIUTO
-    // inputDelete.addEventListener('click', this._deleteForm.bind(this));
   }
   _getPosition() {
     //Se il browser non supporta la geolocalizzazione carichiamo
@@ -155,7 +141,6 @@ class App {
   _loadMap(posizione) {
     const latitudine = posizione.coords.latitude;
     const longitudine = posizione.coords.longitude;
-    console.log(`https://www.google.it/maps/@${latitudine}.${longitudine},14z`);
     const coords = [latitudine, longitudine];
 
     this.#map = L.map('map').setView(coords, this.#mapZoomLevel);
@@ -165,10 +150,10 @@ class App {
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(this.#map);
 
-    //Hanfling clicks on map 
+    //Handling clicks on map
     this.#map.on('click', this._showForm.bind(this));
-    //load map marker in _loadMap ->load afer _getLocalStorage
-    //_getLocalStorage side bar after _renderWorkoutMarker 
+    //I marker degli allenamenti salvati vanno resi qui, dopo che la
+    //mappa esiste (la sidebar è già stata popolata da _getLocalStorage)
     this.#workouts.forEach(work => {
       this._renderWorkoutMarker(work);
     });
@@ -322,7 +307,7 @@ class App {
             <span class="workout__delete">❌</span>
           </div>
             `;
-    //Inseriscee codice HTML sotto al genitore
+    //Inserisce il codice HTML subito dopo il form
     form.insertAdjacentHTML('afterend', html);
   }
   _moveToPopup(e) {
@@ -368,7 +353,6 @@ class App {
   }
   _getLocalStorage() {
     const data = JSON.parse(localStorage.getItem('workout'));
-    console.log(data);
     //Se non ci sono dati ritorna
     if (!data) return;
     //Altrimenti ripristina la nostra matrice di workout:
