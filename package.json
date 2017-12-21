@@ -1,0 +1,24 @@
+{
+  "name": "mapzy",
+  "version": "1.0.0",
+  "description": "Map your running & cycling workouts on an interactive Leaflet map.",
+  "scripts": {
+    "start": "npx --yes serve -l 3000 .",
+    "dev": "npx --yes serve -l 3000 ."
+  },
+  "keywords": [
+    "leaflet",
+    "map",
+    "workout",
+    "running",
+    "cycling",
+    "geolocation",
+    "vanilla-js"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/francemazzi/mapzy.git"
+  },
+  "author": "FraSma",
+  "license": "MIT"
+}
