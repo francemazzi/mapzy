@@ -12,13 +12,27 @@ const inputCadence = document.querySelector('.form__input--cadence');
 const inputElevation = document.querySelector('.form__input--elevation');
 
 if (navigator.geolocation) {
-  navigator.geolocation.getCurrentPosition(
-    function (position) {
-      //Destruttiriamo la latitudine e creiamo una variabile basata sulla proprietà di questo oggetto
-      const { latitude } = position.coords.latitude;
-    },
-    function () {
-      alert('Non riesco a ottenere la tua posizione! ⚠️');
+  navigator.geolocation.getCurrentPosition(mostraPosizione, gestisciErrore);
+  function mostraPosizione(posizione) {
+    const latitudine = posizione.coords.latitude;
+    const longitudine = posizione.coords.longitude;
+    console.log('Latitudine: ' + latitudine);
+    console.log('Longitudine: ' + longitudine);
+  }
+  function gestisciErrore(error) {
+    switch (error.code) {
+      case error.PERMISSION_DENIED:
+        console.log("Permesso negato dall'utente");
+        break;
+      case error.POSITION_UNAVAILABLE:
+        console.log('Impossibile determinare la posizione corrente');
+        break;
+      case error.TIMEOUT:
+        console.log('Il rilevamento della posizione impiega troppo tempo');
+        break;
+      case error.UNKNOWN_ERROR:
+        console.log('Si è verificato un errore sconosciuto');
+        break;
     }
-  );
+  }
 }
