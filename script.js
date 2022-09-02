@@ -11,8 +11,58 @@ const inputDuration = document.querySelector('.form__input--duration');
 const inputCadence = document.querySelector('.form__input--cadence');
 const inputElevation = document.querySelector('.form__input--elevation');
 
-let map, mapEvent;
+//Variabili reste private
+// let map, mapEvent;
+class Workout {
+  //Data di creazione del workout
+  date = new Date();
+  //id converte in string e prende le ultime 10 cifre
+  //cambiato new Date() con Date.now() -> ci da il tempo stampato in tempo reale corrente adesso
+  //Se progetto ha tanti utenti (+100) non dare affidamento su id
+  id = (Date.now() + '').slice(-10);
 
+  constructor(coords, distance, duration) {
+    // this.date = ...
+    // this.id = ...
+    this.coords = coords; //[lat, lng]
+    this.distance = distance; //in km
+    this.duration = duration; // in minuti
+  }
+}
+
+class Running extends Workout {
+  constructor(coords, distance, duration, cadence, elevationGain) {
+    super(coords, distance, duration);
+    this.cadence = cadence;
+    this.calcPace();
+  }
+  calcPace() {
+    //definito in -> min / km
+    this.pace = this.duration / this.distance;
+    return this.pace;
+  }
+}
+class Cycling extends Workout {
+  constructor(coords, distance, duration, elevationGain) {
+    super(coords, distance, duration);
+    this.elevationGain = elevationGain;
+    this.calcSpeed();
+  }
+  calcSpeed() {
+    //definita in km / h
+    this.speed = this.distance / (this.duration / 60);
+    return this.speed;
+  }
+}
+
+//creazione nuova allenamento
+const run1 = new Running([39, -12], 5.2, 24, 178);
+const cycling1 = new Cycling([39, -12], 27, 95, 523);
+console.log(run1, cycling1);
+
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+//Architettura applicazione
 class App {
   //private
   #map;
