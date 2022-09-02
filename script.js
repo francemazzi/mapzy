@@ -67,6 +67,7 @@ class App {
   //private
   #map;
   #mapEvent;
+  #workouts = [];
 
   constructor() {
     this._getPosition();
@@ -75,7 +76,7 @@ class App {
 
     //Inseriamo la selezione running|cycling -> inpuType
     //Andiamo a vedere come sono nascosti i form
-    inputType.addEventListener('change', this._toogleElevationField);
+    inputType.addEventListener('change', this._toggleElevationField);
   }
   _getPosition() {
     if (navigator.geolocation) {
@@ -124,8 +125,8 @@ class App {
     inputDistance.focus();
   }
   _toogleElevationField() {
-    inputElevation.closest('.form__row').classList.toggle('form__row--hidden');
     inputCadence.closest('.form__row').classList.toggle('form__row--hidden');
+    inputElevation.closest('.form__row').classList.toggle('form__row--hidden');
   }
   _newWorkout(e) {
     //Per evitare auto-caricamento
@@ -135,7 +136,8 @@ class App {
     const type = inputType.value;
     const distance = +inputDistance.value;
     const duration = +inputDuration.value;
-
+    const { lat, lng } = this.#mapEvent.latlng;
+    let workout;
     //Vedere se dati sono valii
 
     //Se l'attività è la corsa creare oggetto running
@@ -143,6 +145,7 @@ class App {
       //controllo input valido -> funzione che legge se input è finito o meno
       const validInput = (...inputs) =>
         inputs.every(inp => Number.isFinite(inp));
+      const allPositive = (...inputs) => inputs.every(inp => inp > 0);
 
       const cadence = +inputCadence.value;
 
@@ -151,10 +154,16 @@ class App {
         // !Number.isFinite(distance) ||
         // !Number.isFinite(duration) ||
         // !Number.isFinite(cadence)
-        !validInput(distance, duration, cadence)
+
+        //Semplifichiamo la formula sopra con questa funzione sotto che darà true o false
+        !validInput(distance, duration, cadence) ||
+        !allPositive(distance, duration, cadence)
       ) {
         return alert('Deve inserire un valore positivo!');
       }
+
+      //primo esempio di allenamento
+      workout = new Running([lat, lng], distance, duration, cadence);
     }
 
     //Se l'attività è la bicicletta creare oggetto cycling
@@ -162,29 +171,22 @@ class App {
       const elevation = +inputElevation.value;
 
       //Controllo if se dati sono validi -> se distanza, durata e cadenza non sono numero
-      if (!validInput(distance, duration, elevation)) {
-        return alert('Deve inserire un valore positivo!');
+      if (
+        !validInput(distance, duration, elevation) ||
+        !allPositive(distance, duration, elevation)
+      ) {
+        return alert('Deve inserire un valore positivo! 🚴🏻');
       }
+      workout = new Cycling([lat, lng], distance, duration, elevation);
     }
     //Aggiungere nuovo oggetto al workout array
+    this.#workouts.push(workout);
+    console.log(workout);
 
     //Rendere workout sulla mappa come marker
-    const { lat, lng } = this.#mapEvent.latlng;
-    L.marker([lat, lng])
-      .addTo(this.#map)
-      .bindPopup(
-        L.popup({
-          maxWidth: 250,
-          minWidth: 100,
-          autoClose: false,
-          closeOnClick: false,
-          className: 'running-popup',
-        })
-      )
-      .setPopupContent('Allenamento 🐎!')
-      .openPopup();
 
     //Rendere workout sulla sulla lista
+    this.renderWorkoutMarker(workout);
 
     //Nascondere form e pulire campi input
 
@@ -196,6 +198,21 @@ class App {
         '';
 
     // il primo problema è che dobbiamo utilizzare due variabili che non esistono in questo scope
+  }
+  renderWorkoutMarker(workout) {
+    L.marker([lat, lng])
+      .addTo(this.#map)
+      .bindPopup(
+        L.popup({
+          maxWidth: 250,
+          minWidth: 100,
+          autoClose: false,
+          closeOnClick: false,
+          className: `${type}-popup`,
+        })
+      )
+      .setPopupContent(workout.distance)
+      .openPopup();
   }
 }
 
