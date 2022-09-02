@@ -139,9 +139,33 @@ class App {
     //Vedere se dati sono valii
 
     //Se l'attività è la corsa creare oggetto running
+    if (type === 'running') {
+      //controllo input valido -> funzione che legge se input è finito o meno
+      const validInput = (...inputs) =>
+        inputs.every(inp => Number.isFinite(inp));
+
+      const cadence = +inputCadence.value;
+
+      //Controllo if se dati sono validi -> se distanza, durata e cadenza non sono numero
+      if (
+        // !Number.isFinite(distance) ||
+        // !Number.isFinite(duration) ||
+        // !Number.isFinite(cadence)
+        !validInput(distance, duration, cadence)
+      ) {
+        return alert('Deve inserire un valore positivo!');
+      }
+    }
 
     //Se l'attività è la bicicletta creare oggetto cycling
+    if (type === 'cycling') {
+      const elevation = +inputElevation.value;
 
+      //Controllo if se dati sono validi -> se distanza, durata e cadenza non sono numero
+      if (!validInput(distance, duration, elevation)) {
+        return alert('Deve inserire un valore positivo!');
+      }
+    }
     //Aggiungere nuovo oggetto al workout array
 
     //Rendere workout sulla mappa come marker
