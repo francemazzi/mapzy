@@ -131,14 +131,20 @@ class App {
     //Per evitare auto-caricamento
     e.preventDefault();
 
-    //Clear input fields
-    inputDistance.value =
-      inputDuration.value =
-      inputCadence.value =
-      inputElevation.value =
-        '';
+    //Prendere dati dal form
+    const type = inputType.value;
+    const distance = +inputDistance.value;
+    const duration = +inputDuration.value;
 
-    //display marker
+    //Vedere se dati sono valii
+
+    //Se l'attività è la corsa creare oggetto running
+
+    //Se l'attività è la bicicletta creare oggetto cycling
+
+    //Aggiungere nuovo oggetto al workout array
+
+    //Rendere workout sulla mappa come marker
     const { lat, lng } = this.#mapEvent.latlng;
     L.marker([lat, lng])
       .addTo(this.#map)
@@ -153,6 +159,18 @@ class App {
       )
       .setPopupContent('Allenamento 🐎!')
       .openPopup();
+
+    //Rendere workout sulla sulla lista
+
+    //Nascondere form e pulire campi input
+
+    //Clear input fields
+    inputDistance.value =
+      inputDuration.value =
+      inputCadence.value =
+      inputElevation.value =
+        '';
+
     // il primo problema è che dobbiamo utilizzare due variabili che non esistono in questo scope
   }
 }
