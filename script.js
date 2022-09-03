@@ -326,7 +326,7 @@ class App {
       },
     });
     //Utilizzare interfaccia pubblica
-    workout.click();
+    // workout.click();
   }
   _setLocalStorage() {
     //storage fatto da API JSON, per settare ->  string associata (chiave) 3 valore da memorizzare
