@@ -346,6 +346,12 @@ class App {
       this._renderWorkout(work);
     });
   }
+  reset() {
+    //Per inizializzare il local storage basta rimuovere la parola chiave impostata in precendenza 'workout'
+    localStorage.removeItem('workout');
+    //Seguito dal metodo di ricaricamento automatico della pagina
+    location.reload();
+  }
 }
 
 const app = new App();
