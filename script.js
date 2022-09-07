@@ -15,8 +15,7 @@ class Workout {
   //Data di creazione del workout
   date = new Date();
   //id converte in string e prende le ultime 10 cifre
-  //cambiato new Date() con Date.now() -> ci da il tempo stampato in tempo reale corrente adesso
-  //Se progetto ha tanti utenti (+100) non dare affidamento su id
+  //cambiato new Date() con Date.now()
   id = (Date.now() + '').slice(-10);
 
   constructor(coords, distance, duration) {
@@ -153,10 +152,10 @@ class App {
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(this.#map);
 
-    //Hanfling clicks on map --> abbiamo la possobiilità di accedere all'evneto map
+    //Hanfling clicks on map 
     this.#map.on('click', this._showForm.bind(this));
-    //caricamento dei marker della mappa in _loadMap -> perchè la mappa carica dopo rispetto a _getLocalStorage
-    //_getLocalStorage carica subito la side bar mentre _renderWorkoutMarker engono caricati dopo
+    //load map marker in _loadMap ->load afer _getLocalStorage
+    //_getLocalStorage side bar after _renderWorkoutMarker 
     this.#workouts.forEach(work => {
       this._renderWorkoutMarker(work);
     });
@@ -204,13 +203,13 @@ class App {
 
       const cadence = +inputCadence.value;
 
-      //Controllo if se dati sono validi -> se distanza, durata e cadenza non sono numero
+      //Controllo if se dati sono validi 
       if (
         // !Number.isFinite(distance) ||
         // !Number.isFinite(duration) ||
         // !Number.isFinite(cadence)
 
-        //Semplifichiamo la formula sopra con questa funzione sotto che darà true o false
+        //more simple
         !validInput(distance, duration, cadence) ||
         !allPositive(distance, duration, cadence)
       ) {
@@ -245,7 +244,6 @@ class App {
 
     //Nascondi mappa
     this._hideForm();
-    // il primo problema è che dobbiamo utilizzare due variabili che non esistono in questo scope
 
     //Creazione memorizzazione locale dati
     this._setLocalStorage();
@@ -362,9 +360,9 @@ class App {
   }
 
   reset() {
-    //Per inizializzare il local storage basta rimuovere la parola chiave impostata in precendenza 'workout'
+    //init local storage
     localStorage.removeItem('workout');
-    //Seguito dal metodo di ricaricamento automatico della pagina
+    //load automatico della pagina
     location.reload();
   }
 }
