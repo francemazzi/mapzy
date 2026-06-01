@@ -6,6 +6,16 @@ Mapzy is a small vanilla-JavaScript app: click anywhere on the map, log a
 running or cycling workout, and it gets pinned with a marker and saved in your
 browser. Reload the page and your workouts are still there.
 
+## About this repository
+
+This repo is a **test/sandbox environment** for an old side project. The goal
+was to keep it as close as possible to the original version — same stack, same
+dependencies, no package upgrades — while cleaning up and refining the code
+with [Cursor](https://cursor.com/) and [Claude Code](https://claude.com/product/claude-code).
+
+It is not a rewrite or a modernized fork: it is the same vanilla-JS + Leaflet
+1.2 app, touched only where needed (bug fixes, readability, docs).
+
 ## Features
 
 - 📍 **Geolocation** — the map centers on your position (with an automatic
