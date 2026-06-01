@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "Map your running & cycling workouts on an interactive Leaflet map.",
   "scripts": {
-    "start": "npx --yes serve -l 3000 .",
-    "dev": "npx --yes serve -l 3000 ."
+    "start": "live-server --port=3000",
+    "dev": "live-server --port=3000"
   },
   "keywords": [
     "leaflet",
@@ -20,5 +20,8 @@
     "url": "https://github.com/francemazzi/mapzy.git"
   },
   "author": "FraSma",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "live-server": "^1.2.0"
+  }
 }
