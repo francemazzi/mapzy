@@ -13,15 +13,12 @@ const inputElevation = document.querySelector('.form__input--elevation');
 const DEFAULT_COORDS = [41.9028, 12.4964];
 
 class Workout {
-  //Data di creazione del workout
-  date = new Date();
-  //id converte in string e prende le ultime 10 cifre
-  //cambiato new Date() con Date.now()
-  id = (Date.now() + '').slice(-10);
-
   constructor(coords, distance, duration) {
-    // this.date = ...
-    // this.id = ...
+    //Data di creazione del workout
+    this.date = new Date();
+    //id converte in string e prende le ultime 10 cifre
+    //cambiato new Date() con Date.now()
+    this.id = (Date.now() + '').slice(-10);
     this.coords = coords; //[lat, lng]
     this.distance = distance; //in km
     this.duration = duration; // in minuti
@@ -52,12 +49,10 @@ class Workout {
 }
 
 class Running extends Workout {
-  type = 'running';
-
   constructor(coords, distance, duration, cadence, elevationGain) {
     super(coords, distance, duration);
+    this.type = 'running';
     this.cadence = cadence;
-    // this.type = 'running'
     this.calcPace();
     this._setDescription();
   }
@@ -68,9 +63,9 @@ class Running extends Workout {
   }
 }
 class Cycling extends Workout {
-  type = 'cycling';
   constructor(coords, distance, duration, elevationGain) {
     super(coords, distance, duration);
+    this.type = 'cycling';
     this.elevationGain = elevationGain;
     this.calcSpeed();
     this._setDescription();
@@ -84,15 +79,15 @@ class Cycling extends Workout {
 
 //Architettura applicazione
 class App {
-  //variabili private
-  #map;
-  #mapEvent;
-  #workouts = [];
-  #mapZoomLevel = 13;
-  //Marker Leaflet indicizzati per id del workout, per poterli rimuovere
-  #markers = {};
-
   constructor() {
+    //variabili di istanza (convenzione _ per indicare "private")
+    this._map = undefined;
+    this._mapEvent = undefined;
+    this._workouts = [];
+    this._mapZoomLevel = 13;
+    //Marker Leaflet indicizzati per id del workout, per poterli rimuovere
+    this._markers = {};
+
     //Ottieni la Posizione
     this._getPosition();
 
@@ -143,23 +138,23 @@ class App {
     const longitudine = posizione.coords.longitude;
     const coords = [latitudine, longitudine];
 
-    this.#map = L.map('map').setView(coords, this.#mapZoomLevel);
+    this._map = L.map('map').setView(coords, this._mapZoomLevel);
 
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution:
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    }).addTo(this.#map);
+    }).addTo(this._map);
 
     //Handling clicks on map
-    this.#map.on('click', this._showForm.bind(this));
+    this._map.on('click', this._showForm.bind(this));
     //I marker degli allenamenti salvati vanno resi qui, dopo che la
     //mappa esiste (la sidebar è già stata popolata da _getLocalStorage)
-    this.#workouts.forEach(work => {
+    this._workouts.forEach(work => {
       this._renderWorkoutMarker(work);
     });
   }
   _showForm(mapE) {
-    this.#mapEvent = mapE;
+    this._mapEvent = mapE;
     form.classList.remove('hidden');
     inputDistance.focus();
   }
@@ -189,7 +184,7 @@ class App {
     const type = inputType.value;
     const distance = +inputDistance.value;
     const duration = +inputDuration.value;
-    const { lat, lng } = this.#mapEvent.latlng;
+    const { lat, lng } = this._mapEvent.latlng;
     let workout;
 
     //Helper di validazione condivisi tra running e cycling:
@@ -229,7 +224,7 @@ class App {
       workout = new Cycling([lat, lng], distance, duration, elevation);
     }
     //Aggiungere nuovo oggetto al workout array
-    this.#workouts.push(workout);
+    this._workouts.push(workout);
 
     //Rendere workout sulla mappa come marker
     this._renderWorkoutMarker(workout);
@@ -244,7 +239,7 @@ class App {
   }
   _renderWorkoutMarker(workout) {
     const marker = L.marker(workout.coords)
-      .addTo(this.#map)
+      .addTo(this._map)
       .bindPopup(
         L.popup({
           maxWidth: 250,
@@ -259,7 +254,7 @@ class App {
       )
       .openPopup();
     //Memorizziamo il marker per poterlo rimuovere all'eliminazione
-    this.#markers[workout.id] = marker;
+    this._markers[workout.id] = marker;
   }
   _renderWorkout(workout) {
     let html = `
@@ -319,11 +314,11 @@ class App {
     if (e.target.classList.contains('workout__delete'))
       return this._deleteWorkout(workoutEl);
 
-    const workout = this.#workouts.find(
+    const workout = this._workouts.find(
       work => work.id === workoutEl.dataset.id
     );
     //Sposta la vista sul marker dell'allenamento cliccato
-    this.#map.setView(workout.coords, this.#mapZoomLevel, {
+    this._map.setView(workout.coords, this._mapZoomLevel, {
       animate: true,
       pan: {
         duration: 1,
@@ -334,13 +329,13 @@ class App {
   _deleteWorkout(workoutEl) {
     const id = workoutEl.dataset.id;
     //Rimuovi il marker dalla mappa
-    const marker = this.#markers[id];
+    const marker = this._markers[id];
     if (marker) {
-      this.#map.removeLayer(marker);
-      delete this.#markers[id];
+      this._map.removeLayer(marker);
+      delete this._markers[id];
     }
     //Rimuovi il workout dall'array e l'elemento dalla lista
-    this.#workouts = this.#workouts.filter(work => work.id !== id);
+    this._workouts = this._workouts.filter(work => work.id !== id);
     workoutEl.remove();
     //Aggiorna la persistenza
     this._setLocalStorage();
@@ -349,17 +344,17 @@ class App {
   _setLocalStorage() {
     //storage fatto da API JSON, per settare ->  string associata (chiave) 3 valore da memorizzare
     //Utilizziamo stringify che converte valori istringhe
-    localStorage.setItem('workout', JSON.stringify(this.#workouts));
+    localStorage.setItem('workout', JSON.stringify(this._workouts));
   }
   _getLocalStorage() {
     const data = JSON.parse(localStorage.getItem('workout'));
     //Se non ci sono dati ritorna
     if (!data) return;
     //Altrimenti ripristina la nostra matrice di workout:
-    this.#workouts = data;
+    this._workouts = data;
     //questi data li inseriamo in liste
     //dato che non vogliamo creare nessun array usiamo forEach
-    this.#workouts.forEach(work => {
+    this._workouts.forEach(work => {
       this._renderWorkout(work);
     });
   }

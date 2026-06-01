@@ -20,8 +20,8 @@ browser. Reload the page and your workouts are still there.
 
 ## Tech stack
 
-- Vanilla JavaScript (ES classes, private fields, modules-free)
-- [Leaflet 1.8](https://leafletjs.com/) (loaded from CDN) with
+- Vanilla JavaScript (ES2015 classes, no modules)
+- [Leaflet 1.2](https://leafletjs.com/) (loaded from CDN) with
   [OpenStreetMap](https://www.openstreetmap.org/) tiles
 - Browser Geolocation API and `localStorage`
 - No build step, no framework
@@ -35,11 +35,14 @@ system (`file://`) will not work. The `npm start` script handles this for you:
 ```bash
 git clone https://github.com/francemazzi/mapzy.git
 cd mapzy
+npm install        # installs live-server (dev dependency)
 npm start          # serves the app on http://localhost:3000
 ```
 
-No install or build step is needed — `npm start` fetches a tiny static server
-on the fly. If you prefer not to use Node, any static server works, e.g.:
+There is no build step — `npm start` runs
+[live-server](https://www.npmjs.com/package/live-server), which serves the
+files and live-reloads the browser. If you prefer not to use Node, any static
+server works, e.g.:
 
 ```bash
 python3 -m http.server 3000   # then open http://localhost:3000
@@ -55,7 +58,7 @@ python3 -m http.server 3000   # then open http://localhost:3000
 
 ## Requirements
 
-- A modern browser (ES classes & private fields, Geolocation, `localStorage`)
+- A modern browser (ES2015 classes, Geolocation, `localStorage`)
 - An internet connection (Leaflet and the map tiles are loaded from CDNs)
 
 > **Note** — the UI labels are in Italian (Tipo, Distanza, Durata…).
