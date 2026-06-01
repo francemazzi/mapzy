@@ -1,0 +1,10 @@
+# Dependencies
+node_modules/
+
+# OS files
+.DS_Store
+
+# Editor / local tooling
+.claude/
+.vscode/
+*.log
